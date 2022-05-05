@@ -1,0 +1,8 @@
+-remember chatId and use it in case restart bot. Use redis for that
+-to eliminate exception when the message send to user
+-add features to allow user specify amount of compliments per day
+-add options to sent joke
+-application.properties to application.yaml
+-extract from logic separate ms such as SchedulerMessageService and MessageBuilderService
+-add loging. Use log4j
+-make redirection of messages from Di -> bot - Me
