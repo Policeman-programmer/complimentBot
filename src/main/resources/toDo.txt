@@ -6,3 +6,4 @@
 -extract from logic separate ms such as SchedulerMessageService and MessageBuilderService
 -add loging. Use log4j
 -make redirection of messages from Di -> bot - Me
+-Find out how to resolve path problem between linux and windows
