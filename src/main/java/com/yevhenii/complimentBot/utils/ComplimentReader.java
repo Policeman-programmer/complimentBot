@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class ComplimentReader {
 
     private void readComplimentsFromFile() {
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(complimentFile)))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(complimentFile), StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 compliments.add(line);

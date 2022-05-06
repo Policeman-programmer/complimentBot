@@ -31,21 +31,14 @@ class ComplimentBotApplicationTests {
         FileWriter fileWriter = new FileWriter(complimentFile, true);
 
         String compl1 = "compliment 1";
-        String compl2 = "compliment 2";
-        String compl3 = "compliment 3";
 
-        fileWriter.append(compl1).append("\n")
-                .append(compl2).append("\n")
-                .append(compl3).append("\n");
+        fileWriter.append(compl1).append("\n");
 
         fileWriter.flush();
         fileWriter.close();
 
         ComplimentReader complimentReader = new ComplimentReader(complimentFile);
 
-        assertThat(complimentReader.getCompliment()).isEqualTo("Кохана. " + compl1);
-        assertThat(complimentReader.getCompliment()).isEqualTo("Кохана. " + compl2);
-        assertThat(complimentReader.getCompliment()).isEqualTo("Кохана. " + compl3);
         assertThat(complimentReader.getCompliment()).isEqualTo("Кохана. " + compl1);
 
     }

@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>org.telegram</groupId>
 			<artifactId>telegrambots</artifactId>
-			<version>Latest</version>
+			<version>3.2</version>
 		</dependency>
 	</dependencies>
 
