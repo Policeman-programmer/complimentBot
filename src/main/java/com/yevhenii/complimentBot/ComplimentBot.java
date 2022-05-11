@@ -85,11 +85,15 @@ public class ComplimentBot extends TelegramLongPollingBot {
                     try {
                         execute(new SendMessage()
                                 .setChatId(DI_CHAT_ID)
-                                .setText("Я розумію лише певні команди, тож я передам це ваше послання вашому коханому"));
+                                .setText("Я розумію лише певні команди, тож я передам це послання вашому коханому"));
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
 
+                    try {
                         execute(new SendMessage()
                                 .setChatId(MY_CHAT_ID)
-                                .setText(msgTest));
+                                .setText("Послання від Коханої " + msgTest));
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
