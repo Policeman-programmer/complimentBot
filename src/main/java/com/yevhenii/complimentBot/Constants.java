@@ -21,7 +21,7 @@ public interface Constants {
 
     Long DI_CHAT_ID = 302864380L;
 
-    Long MY_CHAT_ID = null;//272231277
+    Long MY_CHAT_ID = 272231277L;
 
     String REGISTER = "/register"; //register as bot owner. When compliment receiver will send the reply Bot Owner will receive this reply
 
