@@ -25,4 +25,7 @@ public interface Constants {
 
     String REGISTER = "/register"; //register as bot owner. When compliment receiver will send the reply Bot Owner will receive this reply
 
+    String OTHER_TEXT_REPLY = "Я розумію лише певні команди, тож я передам це послання вашому коханому";
+
+
 }

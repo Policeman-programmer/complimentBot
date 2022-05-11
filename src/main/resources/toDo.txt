@@ -2,13 +2,6 @@
 -to eliminate exception when the message send to user
 -add features to allow user specify amount of compliments per day
 -add options to sent joke
--application.properties to application.yaml
--extract from logic separate ms such as SchedulerMessageService and MessageBuilderService
--add loging. Use log4j
--make redirection of messages from Di -> bot - Me
--Find out how to resolve path problem between linux and windows
--make bot universal for any female user
 
-create file if not exist
-write users to file
-read users from file
+-add loging. Use log4j
+-make bot universal for any female user
