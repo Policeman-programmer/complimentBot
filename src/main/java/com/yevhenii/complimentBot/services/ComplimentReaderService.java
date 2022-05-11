@@ -1,36 +1,38 @@
-package com.yevhenii.complimentBot.utils;
+package com.yevhenii.complimentBot.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import javax.annotation.PostConstruct;
+import java.io.File;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-@Component
-public class ComplimentReader {
+@Service
+public class ComplimentReaderService {
+
+    @Autowired
+    private FileReaderWriterService frService;
+
+    @Value("${complimentFilePath}")
+    private String pathToComplimentFile;
 
     private List<String> compliments = new ArrayList<>();
     private Iterator<String> complimentIterator;
-    private File complimentFile;
 
-    @Autowired
-    public ComplimentReader(File complimentFile) {
-        this.complimentFile = complimentFile;
+    @PostConstruct
+    void init() {
         readComplimentsFromFile();
     }
 
     private void readComplimentsFromFile() {
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(complimentFile), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                compliments.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        System.out.println("path to compliments file: " + new File(pathToComplimentFile).getAbsolutePath());
+        compliments = frService.readLinersFromFile(pathToComplimentFile);
 
         Collections.shuffle(compliments);
 

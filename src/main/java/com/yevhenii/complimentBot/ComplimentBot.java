@@ -1,11 +1,13 @@
 package com.yevhenii.complimentBot;
 
-import com.yevhenii.complimentBot.utils.ComplimentReader;
+import com.yevhenii.complimentBot.services.ComplimentReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
+import org.telegram.telegrambots.api.objects.Chat;
+import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -16,26 +18,28 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import static com.yevhenii.complimentBot.utils.Constants.*;
+import static com.yevhenii.complimentBot.Constants.*;
 
 
 @Component
 public class ComplimentBot extends TelegramLongPollingBot {
 
     @Autowired
-    private ComplimentReader complimentReader;
+    private ComplimentReaderService complimentReader;
 
-    @Value("${name}")
-    private String name;
+//    @Value("${botName}")
+//    private String name;
 
-    @Value("${token}")
-    private String token;
+//    @Value("${botToken}")
+//    private String token;
 
-    Thread thread;
-    long delay;
+    private Thread thread;
 
+    private long delay;
 
     ComplimentBot(TelegramBotsApi botsApi) throws TelegramApiRequestException {
         botsApi.registerBot(this);
@@ -43,24 +47,57 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @PostConstruct
     private void init() {
-        Long chatId = 302864380L; //toDo: avoid hardcode
-        startRandomScheduler(chatId); // after firs interaction with bot it remembers chat id in order to after
-                                        //restart app sheduller will continue to work
+        startRandomScheduler(DI_CHAT_ID); //it needed in order restart app scheduler will continue to work
     }
 
     @Override
     public void onUpdateReceived(Update update) {
 
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Long chatId = update.getMessage().getChatId();
 
-            String msgTest = update.getMessage().getText();
-            if (COMPLIMENT_AGAIN.equals(msgTest)) {
-                createSendCompliment(chatId);
-            }else if(START.equals(msgTest)){
-                createSendCompliment(chatId);
-                startRandomScheduler(chatId); // user need it for the first interaction with bot
+            Message message = update.getMessage();
+            Chat chat = message.getChat();
+            Long chatId = message.getChatId();
+
+            if (MY_USER_NAME.equals(chat.getUserName())) {
+
+                if (REGISTER.equals(message.getText())) {
+                    try {
+                        chatId = chat.getId();
+                        execute(new SendMessage()
+                                .setChatId(chatId)
+                                .setText(chatId.toString()));
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            } else if (DI_USER_NAME.equals(chat.getUserName())) { //any message Diana send me redirect to me :)
+
+                String msgTest = message.getText();
+
+                if (COMPLIMENT_AGAIN.equals(msgTest)) {
+
+                    createSendCompliment(chatId);
+
+                } else {
+
+                    try {
+                        execute(new SendMessage()
+                                .setChatId(DI_CHAT_ID)
+                                .setText("Я розумію лише певні команди, тож я передам це ваше послання вашому коханому"));
+
+                        execute(new SendMessage()
+                                .setChatId(MY_CHAT_ID)
+                                .setText(msgTest));
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
             }
+
         }
 
     }
@@ -134,11 +171,10 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Trokhniuk_bot";
+        return "Trokhniuk_bot"; // TestCharmyBot
     }
-
     @Override
     public String getBotToken() {
-        return "5354671221:AAEKJn--hBdCo5fhcrAsojuh2K_4h9cowss";
+        return "5354671221:AAEKJn--hBdCo5fhcrAsojuh2K_4h9cowss"; // 5190160613:AAEptI8l0_IJqsH-M6c_38rqFXzxCgKAPQE
     }
 }
