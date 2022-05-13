@@ -5,14 +5,21 @@ import com.yevhenii.complimentBot.services.ComplimentReaderService;
 import com.yevhenii.complimentBot.services.SchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.TelegramBotsApi;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Chat;
 import org.telegram.telegrambots.api.objects.Message;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import javax.annotation.PostConstruct;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.concurrent.TimeUnit;
 
 import static com.yevhenii.complimentBot.Constants.*;
 
@@ -34,6 +41,11 @@ public class ComplimentBot extends TelegramLongPollingBot {
 //    @Value("${botToken}")
 //    private String token;
 
+    @Autowired
+    ComplimentBot(TelegramBotsApi botsApi) throws TelegramApiRequestException {
+        botsApi.registerBot(this);
+    }
+
     @PostConstruct
     private void init() {
         schedulerService.startRandomScheduler(DI_CHAT_ID, this::createAndSendComplimentByChatId); //it needed in order restart app scheduler will continue to work
@@ -48,36 +60,61 @@ public class ComplimentBot extends TelegramLongPollingBot {
             Chat chat = message.getChat();
             Long chatId = message.getChatId();
 
-            if (MY_USER_NAME.equals(chat.getUserName())) {
-
-                if (REGISTER.equals(message.getText())) {
-                    try {
-                        chatId = chat.getId();
-                        execute(new SendMessage()
-                                .setChatId(chatId)
-                                .setText(chatId.toString()));
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
+            if (REGISTER.equals(message.getText())) {
+                try {
+                    chatId = chat.getId();
+                    execute(new SendMessage()
+                            .setChatId(chatId)
+                            .setText(chatId.toString()));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
                 }
+            }
 
-            } else if (DI_USER_NAME.equals(chat.getUserName())) { //any message Diana send me redirect to me :)
+            String msgTest = message.getText();
 
-                String msgTest = message.getText();
+            checkIfSetInterval(msgTest, chatId);
 
-                if (COMPLIMENT_AGAIN.equals(msgTest)) {
+            if (COMPLIMENT_AGAIN.equals(msgTest)) {
 
-                    createAndSendComplimentByChatId(chatId);
+                createAndSendComplimentByChatId(chatId);
 
-                } else {
-
-                    replyToOtherTextAndSendItToBotOwner(msgTest);
-                }
+            } else if (CHANGE_COMPLIMENT_INTERVAL.equals(msgTest)) {
+                String str = "Максимальний інтервал між компліментами буже складати";
+                intervalChangedReply(chatId, str, botKeyboardService.createIntervalsKeyboard());
+            } else {
+                replyToOtherTextAndSendItToBotOwner(message);
             }
         }
     }
 
-    private void replyToOtherTextAndSendItToBotOwner(String msgTest) {
+    private void checkIfSetInterval(String msgTest, Long chatId) {
+        if (DAY.equals(msgTest))
+            schedulerService.updateMaxTimeToNextCompliment(DAY_MILLS);
+        if (HOURS_12.equals(msgTest))
+            schedulerService.updateMaxTimeToNextCompliment(HOURS_12_MS);
+        if (HOURS_6.equals(msgTest))
+            schedulerService.updateMaxTimeToNextCompliment(HOURS_6_MS);
+        if (HOURS_3.equals(msgTest))
+            schedulerService.updateMaxTimeToNextCompliment(HOURS_3_MS);
+        if (DAY.equals(msgTest) || HOURS_12.equals(msgTest) || HOURS_6.equals(msgTest) || HOURS_3.equals(msgTest)) {
+            intervalChangedReply(chatId, NEXT_COMPLIMENT_TIME_NOTIFICATION + msgTest,
+                    botKeyboardService.createReplyKeyboard());
+        }
+    }
+
+    private void intervalChangedReply(Long chatId, String message, ReplyKeyboardMarkup replyKeyboard) {
+        try {
+            execute(new SendMessage()
+                    .setChatId(chatId)
+                    .setText(message)
+                    .setReplyMarkup(replyKeyboard));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void replyToOtherTextAndSendItToBotOwner(Message msg) {
         try {
             execute(new SendMessage()
                     .setChatId(DI_CHAT_ID)
@@ -89,7 +126,7 @@ public class ComplimentBot extends TelegramLongPollingBot {
         try {
             execute(new SendMessage()
                     .setChatId(MY_CHAT_ID)
-                    .setText("Послання від Коханої " + msgTest));
+                    .setText("Послання від Коханої:\n" + msg.getText()));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -111,7 +148,7 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "TestCharmyBot"; //Trokhniuk_bot
+        return "CharmyTest_bot"; //Trokhniuk_bot
     }
 
     @Override

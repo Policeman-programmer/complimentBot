@@ -5,7 +5,7 @@ import java.time.ZoneId;
 
 public interface Constants {
 
-    String COMPLIMENT_AGAIN = "А можна ще комліментик? :)";
+    String COMPLIMENT_AGAIN = "А можна ще компліментик? :)";
 
     String START = "/start";
 
@@ -26,6 +26,27 @@ public interface Constants {
     String REGISTER = "/register"; //register as bot owner. When compliment receiver will send the reply Bot Owner will receive this reply
 
     String OTHER_TEXT_REPLY = "Я розумію лише певні команди, тож я передам це послання вашому коханому";
+
+    String CHANGE_COMPLIMENT_INTERVAL = "Хочу змінити інтервал отримання компліментів";
+
+    String DAY = "доба";
+
+    String HOURS_12 = "12 годин";
+
+    String HOURS_6 = "6 годин";
+
+    String HOURS_3 = "3 години";
+
+    int DAY_MILLS = 86_400_000;
+
+    int HOURS_12_MS = 43_200_000;
+
+    int HOURS_6_MS = 21_600_000;
+
+    int HOURS_3_MS = 10_800_000;
+
+    String NEXT_COMPLIMENT_TIME_NOTIFICATION = "Інтервал змінено. Наступний комплімент буде не пізніше ніж через ";
+
 
 
 }
