@@ -17,10 +17,6 @@ import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
 
 import javax.annotation.PostConstruct;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.concurrent.TimeUnit;
-
 import static com.yevhenii.complimentBot.Constants.*;
 
 @Component
@@ -53,38 +49,31 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        try {
+            if (update.hasMessage() && update.getMessage().hasText()) {
 
-        if (update.hasMessage() && update.getMessage().hasText()) {
+                Message message = update.getMessage();
+                Chat chat = message.getChat();
+                Long chatId = message.getChatId();
+                String msgTest = message.getText();
 
-            Message message = update.getMessage();
-            Chat chat = message.getChat();
-            Long chatId = message.getChatId();
-
-            if (REGISTER.equals(message.getText())) {
-                try {
+                checkIfSetInterval(msgTest, chatId);
+                if (REGISTER.equals(msgTest)) {
                     chatId = chat.getId();
                     execute(new SendMessage()
                             .setChatId(chatId)
                             .setText(chatId.toString()));
-                } catch (TelegramApiException e) {
-                    e.printStackTrace();
+                } else if (COMPLIMENT_AGAIN.equals(msgTest)) {
+                    createAndSendComplimentByChatId(chatId);
+                } else if (CHANGE_COMPLIMENT_INTERVAL.equals(msgTest)) {
+                    String str = "Максимальний інтервал між компліментами буде складати:";
+                    intervalChangedReply(chatId, str, botKeyboardService.createIntervalsKeyboard());
+                } else {
+                    replyToOtherTextAndSendItToBotOwner(message);
                 }
             }
-
-            String msgTest = message.getText();
-
-            checkIfSetInterval(msgTest, chatId);
-
-            if (COMPLIMENT_AGAIN.equals(msgTest)) {
-
-                createAndSendComplimentByChatId(chatId);
-
-            } else if (CHANGE_COMPLIMENT_INTERVAL.equals(msgTest)) {
-                String str = "Максимальний інтервал між компліментами буже складати";
-                intervalChangedReply(chatId, str, botKeyboardService.createIntervalsKeyboard());
-            } else {
-                replyToOtherTextAndSendItToBotOwner(message);
-            }
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
         }
     }
 
@@ -116,17 +105,13 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     private void replyToOtherTextAndSendItToBotOwner(Message msg) {
         try {
-            execute(new SendMessage()
-                    .setChatId(DI_CHAT_ID)
-                    .setText(OTHER_TEXT_REPLY));
+            execute(new SendMessage().setChatId(DI_CHAT_ID).setText(OTHER_TEXT_REPLY));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
 
         try {
-            execute(new SendMessage()
-                    .setChatId(MY_CHAT_ID)
-                    .setText("Послання від Коханої:\n" + msg.getText()));
+            execute(new SendMessage().setChatId(MY_CHAT_ID).setText("Послання від Коханої:\n" + msg.getText()));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

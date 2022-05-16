@@ -13,7 +13,6 @@ import static com.yevhenii.complimentBot.Constants.*;
 public class SchedulerService {
 
     private Thread thread;
-    private int delay;
 
     private int maxTimeToNextCompliment = HOURS_6_MS;
     long timeForNextCompliment;
@@ -41,7 +40,7 @@ public class SchedulerService {
     }
 
     private void calculateTimeForNextCompliment() {
-        delay = random.nextInt(maxTimeToNextCompliment);
+        int delay = random.nextInt(maxTimeToNextCompliment);
         System.out.println("delay is: " + delay / 1000 / 60 + " minutes");
         timeForNextCompliment = System.currentTimeMillis() + delay;
         System.out.println("Next compliment will be at: " + new Date(timeForNextCompliment));
