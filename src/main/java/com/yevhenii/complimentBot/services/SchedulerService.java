@@ -1,6 +1,7 @@
 package com.yevhenii.complimentBot.services;
 
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.time.LocalTime;
 import java.util.Date;
@@ -18,7 +19,7 @@ public class SchedulerService {
     long timeForNextCompliment;
     Random random = new Random();
 
-    public void startRandomScheduler(Long chatId, Consumer<Long> sendMessage) {
+    public void startRandomScheduler(String chatId, Consumer<String> sendMessage) {
         System.out.println("RandomScheduler was started");
         if (thread == null) {
             thread = new Thread(() -> {

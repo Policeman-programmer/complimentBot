@@ -5,15 +5,12 @@ import com.yevhenii.complimentBot.services.ComplimentReaderService;
 import com.yevhenii.complimentBot.services.SchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.TelegramBotsApi;
-import org.telegram.telegrambots.api.methods.send.SendMessage;
-import org.telegram.telegrambots.api.objects.Chat;
-import org.telegram.telegrambots.api.objects.Message;
-import org.telegram.telegrambots.api.objects.Update;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.exceptions.TelegramApiException;
-import org.telegram.telegrambots.exceptions.TelegramApiRequestException;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
 
@@ -31,14 +28,8 @@ public class ComplimentBot extends TelegramLongPollingBot {
     @Autowired
     private BotKeyboardService botKeyboardService;
 
-//    @Value("${botName}")
-//    private String name;
-//
-//    @Value("${botToken}")
-//    private String token;
-
     @Autowired
-    ComplimentBot(TelegramBotsApi botsApi) throws TelegramApiRequestException {
+    ComplimentBot(TelegramBotsApi botsApi) throws TelegramApiException {
         botsApi.registerBot(this);
     }
 
@@ -53,21 +44,25 @@ public class ComplimentBot extends TelegramLongPollingBot {
             if (update.hasMessage() && update.getMessage().hasText()) {
 
                 Message message = update.getMessage();
-                Chat chat = message.getChat();
-                Long chatId = message.getChatId();
+                String chatId = message.getChatId().toString();
                 String msgTest = message.getText();
 
                 checkIfSetInterval(msgTest, chatId);
                 if (REGISTER.equals(msgTest)) {
-                    chatId = chat.getId();
-                    execute(new SendMessage()
-                            .setChatId(chatId)
-                            .setText(chatId.toString()));
+                    execute(SendMessage
+                            .builder()
+                            .text(chatId)
+                            .chatId(chatId)
+                            .build());
                 } else if (COMPLIMENT_AGAIN.equals(msgTest)) {
                     createAndSendComplimentByChatId(chatId);
                 } else if (CHANGE_COMPLIMENT_INTERVAL.equals(msgTest)) {
-                    String str = "Максимальний інтервал між компліментами буде складати:";
-                    intervalChangedReply(chatId, str, botKeyboardService.createIntervalsKeyboard());
+                    execute(SendMessage
+                            .builder()
+                            .chatId(chatId)
+                            .text("Максимальний інтервал між компліментами буде складати:")
+                            .replyMarkup(botKeyboardService.createIntervalsKeyboard())
+                            .build());
                 } else {
                     replyToOtherTextAndSendItToBotOwner(message);
                 }
@@ -77,7 +72,7 @@ public class ComplimentBot extends TelegramLongPollingBot {
         }
     }
 
-    private void checkIfSetInterval(String msgTest, Long chatId) {
+    private void checkIfSetInterval(String msgTest, String chatId) throws TelegramApiException {
         if (DAY.equals(msgTest))
             schedulerService.updateMaxTimeToNextCompliment(DAY_MILLS);
         if (HOURS_12.equals(msgTest))
@@ -87,45 +82,28 @@ public class ComplimentBot extends TelegramLongPollingBot {
         if (HOURS_3.equals(msgTest))
             schedulerService.updateMaxTimeToNextCompliment(HOURS_3_MS);
         if (DAY.equals(msgTest) || HOURS_12.equals(msgTest) || HOURS_6.equals(msgTest) || HOURS_3.equals(msgTest)) {
-            intervalChangedReply(chatId, NEXT_COMPLIMENT_TIME_NOTIFICATION + msgTest,
-                    botKeyboardService.createReplyKeyboard());
+            execute(SendMessage
+                    .builder()
+                    .chatId(chatId)
+                    .text(NEXT_COMPLIMENT_TIME_NOTIFICATION + msgTest)
+                    .replyMarkup(botKeyboardService.createReplyKeyboard())
+                    .build());
         }
     }
 
-    private void intervalChangedReply(Long chatId, String message, ReplyKeyboardMarkup replyKeyboard) {
-        try {
-            execute(new SendMessage()
-                    .setChatId(chatId)
-                    .setText(message)
-                    .setReplyMarkup(replyKeyboard));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
+    private void replyToOtherTextAndSendItToBotOwner(Message msg) throws TelegramApiException {
+        execute(SendMessage.builder().chatId(DI_CHAT_ID).text(OTHER_TEXT_REPLY).build());
+        execute(SendMessage.builder().chatId(MY_CHAT_ID).text("Послання від Коханої:\n" + msg.getText()).build());
     }
 
-    private void replyToOtherTextAndSendItToBotOwner(Message msg) {
+    private void createAndSendComplimentByChatId(String chatId) {
         try {
-            execute(new SendMessage().setChatId(DI_CHAT_ID).setText(OTHER_TEXT_REPLY));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            execute(new SendMessage().setChatId(MY_CHAT_ID).setText("Послання від Коханої:\n" + msg.getText()));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void createAndSendComplimentByChatId(Long chatId) {
-
-        SendMessage sendMessage = new SendMessage()
-                .setChatId(chatId)
-                .setText(complimentReader.getCompliment())
-                .setReplyMarkup(botKeyboardService.createReplyKeyboard());
-
-        try {
-            execute(sendMessage); // Sending our message object to user
+            execute(SendMessage
+                    .builder()
+                    .chatId(chatId)
+                    .text(complimentReader.getCompliment())
+                    .replyMarkup(botKeyboardService.createReplyKeyboard())
+                    .build());
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }

@@ -19,9 +19,9 @@ public interface Constants {
 
     String DI_USER_NAME = "TrDiana";
 
-    Long DI_CHAT_ID = 302864380L;
+    String DI_CHAT_ID = "302864380";
 
-    Long MY_CHAT_ID = 272231277L;
+    String MY_CHAT_ID = "272231277";
 
     String REGISTER = "/register"; //register as bot owner. When compliment receiver will send the reply Bot Owner will receive this reply
 
@@ -29,7 +29,7 @@ public interface Constants {
 
     String CHANGE_COMPLIMENT_INTERVAL = "Хочу змінити інтервал отримання компліментів";
 
-    String DAY = "доба";
+    String DAY = "добу";
 
     String HOURS_12 = "12 годин";
 

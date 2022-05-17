@@ -1,9 +1,9 @@
 package com.yevhenii.complimentBot.services;
 
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,8 @@ public class BotKeyboardService {
         // Добавляем все строчки клавиатуры в список
         keyboard.add(keyboardFirstRow);
         // и устанваливаем этот список нашей клавиатуре
-        return replyKeyboardMarkup.setKeyboard(keyboard);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
     }
 
     public synchronized ReplyKeyboardMarkup createIntervalsKeyboard() {
@@ -47,7 +48,8 @@ public class BotKeyboardService {
         keyboardFirstRow.add(new KeyboardButton(HOURS_6));
         keyboardFirstRow.add(new KeyboardButton(HOURS_3));
         keyboard.add(keyboardFirstRow);
-        return replyKeyboardMarkup.setKeyboard(keyboard);
+        replyKeyboardMarkup.setKeyboard(keyboard);
+        return replyKeyboardMarkup;
     }
 
 }
