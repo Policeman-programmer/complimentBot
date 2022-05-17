@@ -111,11 +111,11 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "CharmyTest_bot"; //Trokhniuk_bot
+        return "Trokhniuk_bot"; //CharmyTest_bot
     }
 
     @Override
     public String getBotToken() {
-        return "5190160613:AAEptI8l0_IJqsH-M6c_38rqFXzxCgKAPQE"; //5354671221:AAEKJn--hBdCo5fhcrAsojuh2K_4h9cowss
+        return "5354671221:AAEKJn--hBdCo5fhcrAsojuh2K_4h9cowss"; //5190160613:AAEptI8l0_IJqsH-M6c_38rqFXzxCgKAPQE
     }
 }
