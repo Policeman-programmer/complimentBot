@@ -47,8 +47,22 @@ public class ComplimentBot extends TelegramLongPollingBot {
                 String chatId = message.getChatId().toString();
                 String msgTest = message.getText();
 
-                checkIfSetInterval(msgTest, chatId);
-                if (REGISTER.equals(msgTest)) {
+                if (DAY.equals(msgTest)){
+                    schedulerService.updateMaxTimeToNextCompliment(DAY_MILLS);
+                }else if (HOURS_12.equals(msgTest)){
+                    schedulerService.updateMaxTimeToNextCompliment(HOURS_12_MS);
+                }else if (HOURS_6.equals(msgTest)){
+                    schedulerService.updateMaxTimeToNextCompliment(HOURS_6_MS);
+                }else if (HOURS_3.equals(msgTest)){
+                    schedulerService.updateMaxTimeToNextCompliment(HOURS_3_MS);
+                }else if (DAY.equals(msgTest) || HOURS_12.equals(msgTest) || HOURS_6.equals(msgTest) || HOURS_3.equals(msgTest)) {
+                    execute(SendMessage
+                            .builder()
+                            .chatId(chatId)
+                            .text(NEXT_COMPLIMENT_TIME_NOTIFICATION + msgTest)
+                            .replyMarkup(botKeyboardService.createReplyKeyboard())
+                            .build());
+                }else if (REGISTER.equals(msgTest)) {
                     execute(SendMessage
                             .builder()
                             .text(chatId)
@@ -69,25 +83,6 @@ public class ComplimentBot extends TelegramLongPollingBot {
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void checkIfSetInterval(String msgTest, String chatId) throws TelegramApiException {
-        if (DAY.equals(msgTest))
-            schedulerService.updateMaxTimeToNextCompliment(DAY_MILLS);
-        if (HOURS_12.equals(msgTest))
-            schedulerService.updateMaxTimeToNextCompliment(HOURS_12_MS);
-        if (HOURS_6.equals(msgTest))
-            schedulerService.updateMaxTimeToNextCompliment(HOURS_6_MS);
-        if (HOURS_3.equals(msgTest))
-            schedulerService.updateMaxTimeToNextCompliment(HOURS_3_MS);
-        if (DAY.equals(msgTest) || HOURS_12.equals(msgTest) || HOURS_6.equals(msgTest) || HOURS_3.equals(msgTest)) {
-            execute(SendMessage
-                    .builder()
-                    .chatId(chatId)
-                    .text(NEXT_COMPLIMENT_TIME_NOTIFICATION + msgTest)
-                    .replyMarkup(botKeyboardService.createReplyKeyboard())
-                    .build());
         }
     }
 
