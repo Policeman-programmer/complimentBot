@@ -16,7 +16,9 @@ public class SchedulerService {
     private Thread thread;
 
     private int maxTimeToNextCompliment = HOURS_6_MS;
+
     long timeForNextCompliment;
+
     Random random = new Random();
 
     public void startRandomScheduler(String chatId, Consumer<String> sendMessage) {

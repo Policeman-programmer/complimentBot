@@ -24,18 +24,13 @@ public class BotKeyboardService {
     }
 
     public synchronized ReplyKeyboardMarkup createReplyKeyboard() {
-        // Создаем список строк клавиатуры
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        // Первая строчка клавиатуры
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        // Добавляем кнопки в первую строчку клавиатуры
         keyboardFirstRow.add(new KeyboardButton(COMPLIMENT_AGAIN));
         keyboardFirstRow.add(new KeyboardButton(CHANGE_COMPLIMENT_INTERVAL));
 
-        // Добавляем все строчки клавиатуры в список
         keyboard.add(keyboardFirstRow);
-        // и устанваливаем этот список нашей клавиатуре
         replyKeyboardMarkup.setKeyboard(keyboard);
         return replyKeyboardMarkup;
     }
