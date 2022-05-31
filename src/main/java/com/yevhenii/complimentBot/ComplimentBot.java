@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import javax.annotation.PostConstruct;
 
@@ -35,12 +36,9 @@ public class ComplimentBot extends TelegramLongPollingBot {
     @Autowired
     private BotKeyboardService botKeyboardService;
 
-    @Autowired
-    private TelegramBotsApi botsApi;
-
     @PostConstruct
     private void init() throws TelegramApiException {
-        botsApi.registerBot(this);
+        new TelegramBotsApi(DefaultBotSession.class).registerBot(this);
         schedulerService.startRandomScheduler(DI_CHAT_ID, this::createAndSendComplimentByChatId); //it needed in order restart app scheduler will continue to work
     }
 
