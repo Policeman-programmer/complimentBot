@@ -4,6 +4,7 @@ import com.yevhenii.complimentBot.services.BotKeyboardService;
 import com.yevhenii.complimentBot.services.ComplimentReaderService;
 import com.yevhenii.complimentBot.services.SchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -19,6 +20,12 @@ import static com.yevhenii.complimentBot.Constants.*;
 @Component
 public class ComplimentBot extends TelegramLongPollingBot {
 
+    @Value("${botName}")
+    private String botUsername;
+
+    @Value("${botToken}")
+    private String botToken;
+
     @Autowired
     private ComplimentReaderService complimentReader;
 
@@ -29,12 +36,11 @@ public class ComplimentBot extends TelegramLongPollingBot {
     private BotKeyboardService botKeyboardService;
 
     @Autowired
-    ComplimentBot(TelegramBotsApi botsApi) throws TelegramApiException {
-        botsApi.registerBot(this);
-    }
+    private TelegramBotsApi botsApi;
 
     @PostConstruct
-    private void init() {
+    private void init() throws TelegramApiException {
+        botsApi.registerBot(this);
         schedulerService.startRandomScheduler(DI_CHAT_ID, this::createAndSendComplimentByChatId); //it needed in order restart app scheduler will continue to work
     }
 
@@ -124,11 +130,11 @@ public class ComplimentBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Trokhniuk_bot"; // CharmyTest_bot
+        return botUsername;
     }
 
     @Override
     public String getBotToken() {
-        return "5354671221:AAEKJn--hBdCo5fhcrAsojuh2K_4h9cowss"; //5190160613:AAEptI8l0_IJqsH-M6c_38rqFXzxCgKAPQE
+        return botToken;
     }
 }
