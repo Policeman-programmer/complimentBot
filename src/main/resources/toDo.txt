@@ -1,4 +1,6 @@
--remember chatId and use it in case restart bot. Use redis for that
+-cover by tests
+-create CI/CD process
+-remember chatId and use it in case restart bot. Use SQLite for that
 -add options to sent joke
 -add loging. Use log4j
 -make bot universal for any female user

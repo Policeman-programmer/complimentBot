@@ -39,7 +39,7 @@ public class ComplimentBot extends TelegramLongPollingBot {
     @PostConstruct
     private void init() throws TelegramApiException {
         new TelegramBotsApi(DefaultBotSession.class).registerBot(this);
-        schedulerService.startRandomScheduler(DI_CHAT_ID, this::createAndSendComplimentByChatId); //it needed in order restart app scheduler will continue to work
+        schedulerService.randomScheduler(DI_CHAT_ID, this::createAndSendComplimentByChatId).start(); //it needed in order restart app scheduler will continue to work
     }
 
     @Override
